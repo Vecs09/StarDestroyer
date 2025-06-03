@@ -25,11 +25,16 @@ let oleada = 0;
 let maxOleadas = 3;
 let jefeMostrado = false;
 let soundtrack;
-
+let disparoSound;
+let disparoSound2;
+let EasterSound;
 
 function preload() {
   soundFormats('mp3', 'ogg');
   soundtrack = loadSound('assets/soundtrack.mp3');
+  disparoSound = loadSound('assets/Blaster.mp3');
+  disparoSound2 = loadSound('assets/BlasterBoss.mp3');
+  EasterSound = loadSound('assets/Easteregg.mp3');
   portada = loadImage('assets/Portada.png');
   introImg1 = loadImage('assets/Level1.png');
   introImg2 = loadImage('assets/Level2.jpg');
@@ -134,6 +139,7 @@ function playGame() {
   nave.x = constrain(nave.x, nave.size / 2, width - nave.size / 2);
   if (firing && fireCooldown <= 0) {
     bullets.push({ x: nave.x, y: nave.y - nave.size / 2 });
+    if (disparoSound.isLoaded()) disparoSound.play();
     fireCooldown = 10;
   }
   if (fireCooldown > 0) fireCooldown--;
@@ -326,7 +332,6 @@ function updateEnemigos() {
   }
 }
 
-
 function updateJefe() {
   if (!jefe) return;
   image(jefeImg, jefe.x, jefe.y, 100, 100);
@@ -334,6 +339,7 @@ function updateJefe() {
   let dx = target.x - jefe.x;
   let dy = target.y - jefe.y;
   let distToTarget = dist(jefe.x, jefe.y, target.x, target.y);
+
   if (distToTarget > 2) {
     jefe.x += dx * 0.05;
     jefe.y += dy * 0.05;
@@ -344,6 +350,8 @@ function updateJefe() {
 }
 
 function dispararJefe() {
+  disparoSound2.setVolume(1.0);
+  if (disparoSound2.isLoaded()) disparoSound2.play();
   let dirs = [
     { dx: 0, dy: -5 }, { dx: 0, dy: 5 },
     { dx: -5, dy: 0 }, { dx: 5, dy: 0 },
@@ -356,6 +364,7 @@ function dispararJefe() {
     }
   });
 }
+
 
 function drawCabecera() {
   fill(255);
@@ -402,15 +411,23 @@ function mostrarTopScores() {
 
 function crearInputNombre() {
   inputNombre = createInput('');
-  inputNombre.attribute('maxlength', 3);
+  inputNombre.attribute('maxlength', 4);
   inputNombre.position(width / 2 - 50, height / 2 - 20);
   inputNombre.size(100);
   inputNombre.style('text-align', 'center');
   inputNombre.style('font-size', '20px');
   inputNombre.hide();
   inputNombre.input(() => {
-    if (inputNombre.value().length === 3) {
+    if (inputNombre.value().length === 4) {
       nombreJugador = inputNombre.value().toUpperCase();
+
+      if (nombreJugador === 'R2D2') {
+        if (EasterSound.isLoaded()) {
+          EasterSound.setVolume(1.0);  
+          EasterSound.play();
+        }
+      }
+
       topScores.push({ nombre: nombreJugador, puntos: puntos });
       topScores.sort((a, b) => b.puntos - a.puntos);
       topScores = topScores.slice(0, 5);
