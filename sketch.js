@@ -1,5 +1,5 @@
 let gameState = 'start';
-let portada, introImg1, introImg2, introImg3, naveImg, enemigoImg, enemigo2Img, gameOverImg, jefeImg,youwinImg;
+let portada, introImg1, introImg2, introImg3, naveImg, enemigoImg, enemigo2Img, gameOverImg, jefeImg, youwinImg;
 let nave;
 let bullets = [];
 let enemigos = [];
@@ -24,9 +24,12 @@ let jefeDisparoCooldown = 0;
 let oleada = 0;
 let maxOleadas = 3;
 let jefeMostrado = false;
+let soundtrack;
 
 
 function preload() {
+  soundFormats('mp3', 'ogg');
+  soundtrack = loadSound('assets/soundtrack.mp3');
   portada = loadImage('assets/Portada.png');
   introImg1 = loadImage('assets/Level1.png');
   introImg2 = loadImage('assets/Level2.jpg');
@@ -42,6 +45,11 @@ function preload() {
 function setup() {
   createCanvas(944, 528);
   imageMode(CENTER);
+
+  //SOUNDTRACK
+  soundtrack.setLoop(true);
+  soundtrack.setVolume(0.5);
+  soundtrack.play();
   nave = { x: width / 2, y: height - 60, size: 80, speed: 8 };
   generarEnemigos();
   crearInputNombre();
@@ -94,6 +102,9 @@ function showIntro() {
 }
 
 function keyPressed() {
+  if (soundtrack && !soundtrack.isPlaying()) {
+    soundtrack.play();
+  }
   if (gameState === 'start' && (key === 'p' || key === 'P')) {
     resetGame();
     introStartTime = millis();
@@ -103,11 +114,11 @@ function keyPressed() {
   }
   if (key === ' ') firing = true;
   if ((gameState === 'gameover' || gameState === 'youwin') && (key === 'r' || key === 'R')) {
-  if (inputNombre.elt.style.display === 'none') {
-    resetGame();
-    gameState = 'start';
+    if (inputNombre.elt.style.display === 'none') {
+      resetGame();
+      gameState = 'start';
+    }
   }
-}
 
 }
 
@@ -334,10 +345,10 @@ function updateJefe() {
 
 function dispararJefe() {
   let dirs = [
-     { dx: 0, dy: -5 }, { dx: 0, dy: 5 },
-     { dx: -5, dy: 0 }, { dx: 5, dy: 0 },
-     { dx: -3.5, dy: -3.5 }, { dx: 3.5, dy: -3.5 },
-     { dx: -3.5, dy: 3.5 }, { dx: 3.5, dy: 3.5 }
+    { dx: 0, dy: -5 }, { dx: 0, dy: 5 },
+    { dx: -5, dy: 0 }, { dx: 5, dy: 0 },
+    { dx: -3.5, dy: -3.5 }, { dx: 3.5, dy: -3.5 },
+    { dx: -3.5, dy: 3.5 }, { dx: 3.5, dy: 3.5 }
   ];
   dirs.forEach(d => {
     for (let i = 0; i < 12; i++) {
@@ -407,3 +418,4 @@ function crearInputNombre() {
     }
   });
 }
+
