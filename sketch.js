@@ -349,9 +349,9 @@ function showYouWin() {
 }
 
 function resetGame() {
-  vidas =  300;
+  vidas =  3;
   puntos = 0;
-  nivel = 2;
+  nivel = 1;
   nave.x = width / 2;
   bullets = [];
   jefe = null;
