@@ -1,5 +1,5 @@
 let gameState = 'start';
-let portada, introImg1, introImg2, introImg3, naveImg, enemigoImg, enemigo2Img, gameOverImg, jefeImg,youwinImg;
+let portada, introImg1, introImg2, introImg3, naveImg, enemigoImg, enemigo2Img, gameOverImg, jefeImg, youwinImg;
 let nave;
 let bullets = [];
 let enemigos = [];
@@ -24,6 +24,11 @@ let jefeDisparoCooldown = 0;
 let oleada = 0;
 let maxOleadas = 3;
 let jefeMostrado = false;
+let soundtrack;
+let blasterSound;
+let bossSound;
+let easteregg;
+let winSound;
 
 
 function preload() {
@@ -37,6 +42,13 @@ function preload() {
   gameOverImg = loadImage('assets/GAMEOVER.jpg');
   youwinImg = loadImage('assets/YOUWIN.jpg');
   jefeImg = loadImage('assets/finalboss.png');
+  soundtrack = loadSound('Soundtrack.mp3');
+  blasterSound = loadSound('Blaster.mp3');
+  bossSound = loadSound('BlasterBoss.mp3');
+  easteregg = loadSound("Easteregg.mp3");
+  winSound = loadSound("Win.mp3");
+
+
 }
 
 function setup() {
@@ -66,7 +78,6 @@ function draw() {
     case 'youwin': showYouWin(); break;
   }
 }
-
 
 function showPortada() {
   image(portada, width / 2, height / 2, width, height);
@@ -100,15 +111,19 @@ function keyPressed() {
     introAlpha = 255;
     introFadeStart = false;
     gameState = 'intro';
+    if (!soundtrack.isPlaying()) {
+      soundtrack.loop();
+      soundtrack.setVolume(0.2);
+
+    }
   }
   if (key === ' ') firing = true;
   if ((gameState === 'gameover' || gameState === 'youwin') && (key === 'r' || key === 'R')) {
-  if (inputNombre.elt.style.display === 'none') {
-    resetGame();
-    gameState = 'start';
+    if (inputNombre.elt.style.display === 'none') {
+      resetGame();
+      gameState = 'start';
+    }
   }
-}
-
 }
 
 function keyReleased() {
@@ -122,9 +137,14 @@ function playGame() {
   if (keyIsDown(RIGHT_ARROW)) nave.x += nave.speed;
   nave.x = constrain(nave.x, nave.size / 2, width - nave.size / 2);
   if (firing && fireCooldown <= 0) {
-    bullets.push({ x: nave.x, y: nave.y - nave.size / 2 });
-    fireCooldown = 10;
+  bullets.push({ x: nave.x, y: nave.y - nave.size / 2 });
+  fireCooldown = 10;
+  if (blasterSound.isLoaded()) {
+    blasterSound.play();
+    blasterSound.setVolume(0.2);
   }
+}
+
   if (fireCooldown > 0) fireCooldown--;
   drawNave(nave.x, nave.y);
   updateBullets();
@@ -136,6 +156,7 @@ function playGame() {
     inputNombre.show();
     inputNombre.value('');
     inputNombre.elt.focus();
+    soundtrack.stop();
   }
 }
 
@@ -173,8 +194,13 @@ function updateBullets() {
           inputNombre.show();
           inputNombre.value('');
           inputNombre.elt.focus();
-        }
+          soundtrack.stop();
+          if (winSound.isLoaded()) {
+              winSound.play();
+              winSound.setVolume(0.5);
 
+  }
+        }
       }
       if (b.y < -10) bullets.splice(i, 1);
     } else {
@@ -192,70 +218,25 @@ function updateBullets() {
 
 function generarEnemigos() {
   enemigos = [];
-
   if (nivel === 1) {
     for (let i = 0; i < 10; i++) {
-      enemigos.push({
-        x: random(50, width - 50),
-        y: random(-300, -50),
-        speed: random(1, 2),
-        tipo: 'normal'
-      });
+      enemigos.push({ x: random(50, width - 50), y: random(-300, -50), speed: random(1, 2), tipo: 'normal' });
     }
   } else if (nivel === 2) {
     for (let i = 0; i < 8; i++) {
-      enemigos.push({
-        x: random(50, width - 50),
-        y: random(-300, -50),
-        speed: random(1, 2),
-        tipo: 'zigzag',
-        dir: 1,
-        fireTimer: int(random(60, 180))
-      });
+      enemigos.push({ x: random(50, width - 50), y: random(-300, -50), speed: random(1, 2), tipo: 'zigzag', dir: 1, fireTimer: int(random(60, 180)) });
     }
-    enemigos.push({
-      x: random(100, width - 100),
-      y: -100,
-      speed: 1,
-      tipo: 'resistente',
-      resistencia: 3
-    });
-    enemigos.push({
-      x: random(100, width - 100),
-      y: -150,
-      speed: 1,
-      tipo: 'resistente',
-      resistencia: 3
-    });
+    enemigos.push({ x: random(100, width - 100), y: random(-300, -50), speed: 1, tipo: 'resistente', resistencia: 3 });
+    enemigos.push({ x: random(100, width - 100), y: random(-300, -50), speed: 1, tipo: 'resistente', resistencia: 3 });
   } else if (nivel === 3) {
     if (oleada < maxOleadas) {
       for (let i = 0; i < 5 + oleada * 2; i++) {
-        enemigos.push({
-          x: random(50, width - 50),
-          y: random(-300, -50),
-          speed: random(1.5, 2),
-          tipo: 'normal',
-          fireTimer: int(random(60, 180))
-        });
+        enemigos.push({ x: random(50, width - 50), y: random(-300, -50), speed: random(1.5, 2), tipo: 'normal', fireTimer: int(random(60, 180)) });
       }
       for (let i = 0; i < 2; i++) {
-        enemigos.push({
-          x: random(50, width - 50),
-          y: random(-300, -50),
-          speed: 1.5,
-          tipo: 'zigzag',
-          dir: 1,
-          fireTimer: int(random(60, 180))
-        });
+        enemigos.push({ x: random(50, width - 50), y: random(-300, -50), speed: 1.5, tipo: 'zigzag', dir: 1, fireTimer: int(random(60, 180)) });
       }
-      enemigos.push({
-        x: random(100, width - 100),
-        y: -100,
-        speed: 1,
-        tipo: 'resistente',
-        resistencia: 3,
-        fireTimer: int(random(60, 180))
-      });
+      enemigos.push({ x: random(100, width - 100), y: -100, speed: 1, tipo: 'resistente', resistencia: 3, fireTimer: int(random(60, 180)) });
     } else if (!jefeMostrado) {
       jefe = { x: width / 2, y: 100 };
       jefeMostrado = true;
@@ -263,48 +244,33 @@ function generarEnemigos() {
   }
 }
 
-
 function updateEnemigos() {
   for (let i = enemigos.length - 1; i >= 0; i--) {
     let e = enemigos[i];
-
-    if (e.tipo === 'zigzag') {
-      e.x += sin(frameCount * 0.1 + i) * 2;
-    }
-
+    if (e.tipo === 'zigzag') e.x += sin(frameCount * 0.1 + i) * 2;
     e.y += e.speed;
-
     if ((nivel === 2 && e.tipo !== 'resistente') || nivel === 3) {
       if (e.fireTimer !== undefined) {
         e.fireTimer--;
         if (e.fireTimer <= 0) {
-          bullets.push({
-            x: e.x,
-            y: e.y + 30,
-            dx: 0,
-            dy: 5,
-            enemigo: true
-          });
+          bullets.push({ x: e.x, y: e.y + 30, dx: 0, dy: 5, enemigo: true });
           e.fireTimer = int(random(120, 240));
         }
       }
     }
-
     let img = e.tipo === 'zigzag' || e.tipo === 'resistente' ? enemigo2Img : enemigoImg;
     image(img, e.x, e.y, 60, 60);
-
     if (e.y > height || dist(e.x, e.y, nave.x, nave.y) < 40) {
       enemigos.splice(i, 1);
       vidas--;
     }
   }
-
   if (enemigos.length === 0 && nivel === 3) {
     if (oleada < maxOleadas) {
       oleada++;
       generarEnemigos();
     } else if (!jefeMostrado) {
-      generarEnemigos(); // muestra jefe
+      generarEnemigos();
     }
   } else if (enemigos.length === 0 && nivel < 3) {
     nivel++;
@@ -315,10 +281,9 @@ function updateEnemigos() {
   }
 }
 
-
 function updateJefe() {
   if (!jefe) return;
-  image(jefeImg, jefe.x, jefe.y, 100, 100);
+  image(jefeImg, jefe.x, jefe.y, 200, 200);
   let target = jefePosiciones[jefeMovimiento];
   let dx = target.x - jefe.x;
   let dy = target.y - jefe.y;
@@ -334,17 +299,37 @@ function updateJefe() {
 
 function dispararJefe() {
   let dirs = [
-     { dx: 0, dy: -5 }, { dx: 0, dy: 5 },
-     { dx: -5, dy: 0 }, { dx: 5, dy: 0 },
-     { dx: -3.5, dy: -3.5 }, { dx: 3.5, dy: -3.5 },
-     { dx: -3.5, dy: 3.5 }, { dx: 3.5, dy: 3.5 }
+    { dx: 0, dy: -5 },   
+    { dx: 0, dy: 5 },    
+    { dx: -5, dy: 0 },   
+    { dx: 5, dy: 0 },    
+    { dx: -3.5, dy: -3.5 }, 
+    { dx: 3.5, dy: -3.5 }, 
+    { dx: -3.5, dy: 3.5 }, 
+    { dx: 3.5, dy: 3.5 }, 
+    { dx: -2.5, dy: -5 },
+    { dx: 2.5, dy: -5 },
+    { dx: -2.5, dy: 5 },
+    { dx: 2.5, dy: 5 },
+    { dx: -5, dy: -2.5 },
+    { dx: 5, dy: -2.5 },
+    { dx: -5, dy: 2.5 },
+    { dx: 5, dy: 2.5 }
   ];
+
   dirs.forEach(d => {
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 4; i++) {
       bullets.push({ x: jefe.x, y: jefe.y, dx: d.dx, dy: d.dy, enemigo: true });
     }
   });
+
+  if (bossSound.isLoaded()) {
+    bossSound.play();
+    bossSound.setVolume(2.5);
+  }
 }
+
+
 
 function drawCabecera() {
   fill(255);
@@ -363,11 +348,10 @@ function showYouWin() {
   image(youwinImg, width / 2, height / 2, width, height);
 }
 
-
 function resetGame() {
-  vidas = 3;
+  vidas =  300;
   puntos = 0;
-  nivel = 1;
+  nivel = 2;
   nave.x = width / 2;
   bullets = [];
   jefe = null;
@@ -376,7 +360,6 @@ function resetGame() {
   jefeMostrado = false;
   generarEnemigos();
 }
-
 
 function mostrarTopScores() {
   fill(255);
@@ -388,18 +371,24 @@ function mostrarTopScores() {
     text(`${i + 1}.- ${topScores[i].nombre}: ${topScores[i].puntos}`, startX, startY + i * 40);
   }
 }
-
 function crearInputNombre() {
   inputNombre = createInput('');
-  inputNombre.attribute('maxlength', 3);
+  inputNombre.attribute('maxlength', 4);
   inputNombre.position(width / 2 - 50, height / 2 - 20);
   inputNombre.size(100);
   inputNombre.style('text-align', 'center');
   inputNombre.style('font-size', '20px');
   inputNombre.hide();
+
   inputNombre.input(() => {
-    if (inputNombre.value().length === 3) {
-      nombreJugador = inputNombre.value().toUpperCase();
+    let valor = inputNombre.value().toUpperCase();
+
+    if (valor === "R2D2" && easteregg.isLoaded()) {
+      easteregg.play();
+    }
+
+    if (valor.length === 4) {
+      nombreJugador = valor;
       topScores.push({ nombre: nombreJugador, puntos: puntos });
       topScores.sort((a, b) => b.puntos - a.puntos);
       topScores = topScores.slice(0, 5);
