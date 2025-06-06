@@ -247,7 +247,9 @@ function generarEnemigos() {
 function updateEnemigos() {
   for (let i = enemigos.length - 1; i >= 0; i--) {
     let e = enemigos[i];
-    if (e.tipo === 'zigzag') e.x += sin(frameCount * 0.1 + i) * 2;
+if (e.tipo === 'zigzag' || e.tipo === 'resistente') {
+  e.x += sin(frameCount * 0.1 + i) * 2;
+}
     e.y += e.speed;
     if ((nivel === 2 && e.tipo !== 'resistente') || nivel === 3) {
       if (e.fireTimer !== undefined) {
