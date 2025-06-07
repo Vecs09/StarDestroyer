@@ -54,7 +54,7 @@ function preload() {
 function setup() {
   createCanvas(944, 528);
   imageMode(CENTER);
-  nave = { x: width / 2, y: height - 60, size: 80, speed: 8 };
+  nave = { x: width / 2, y: height - 60, size: 80, speed: 9 };
   generarEnemigos();
   crearInputNombre();
   jefePosiciones = [
@@ -224,19 +224,21 @@ function generarEnemigos() {
     }
   } else if (nivel === 2) {
     for (let i = 0; i < 8; i++) {
-      enemigos.push({ x: random(50, width - 50), y: random(-300, -50), speed: random(1, 2), tipo: 'zigzag', dir: 1, fireTimer: int(random(60, 180)) });
+      enemigos.push({ x: random(50, width - 50), y: random(-300, -50), speed: random(1, 2), tipo: 'zigzag', dir: 1, fireTimer: int(random(30, 90)) });
     }
-    enemigos.push({ x: random(100, width - 100), y: random(-300, -50), speed: 1, tipo: 'resistente', resistencia: 3 });
-    enemigos.push({ x: random(100, width - 100), y: random(-300, -50), speed: 1, tipo: 'resistente', resistencia: 3 });
+    enemigos.push({ x: random(100, width - 100), y: random(-300, -50), speed: 2, tipo: 'resistente', resistencia: 3, fireTimer: int(random(30, 90)) });
+
+    enemigos.push({ x: random(100, width - 100), y: random(-300, -50), speed: 2, tipo: 'resistente', resistencia: 3, fireTimer: int(random(30, 90)) });
+
   } else if (nivel === 3) {
     if (oleada < maxOleadas) {
       for (let i = 0; i < 5 + oleada * 2; i++) {
         enemigos.push({ x: random(50, width - 50), y: random(-300, -50), speed: random(1.5, 2), tipo: 'normal', fireTimer: int(random(60, 180)) });
       }
       for (let i = 0; i < 2; i++) {
-        enemigos.push({ x: random(50, width - 50), y: random(-300, -50), speed: 1.5, tipo: 'zigzag', dir: 1, fireTimer: int(random(60, 180)) });
+        enemigos.push({ x: random(50, width - 50), y: random(-300, -50), speed: 2, tipo: 'zigzag', dir: 1, fireTimer: int(random(60, 180)) });
       }
-      enemigos.push({ x: random(100, width - 100), y: -100, speed: 1, tipo: 'resistente', resistencia: 3, fireTimer: int(random(60, 180)) });
+      enemigos.push({ x: random(100, width - 100), y: -100, speed: 1.5, tipo: 'resistente', resistencia: 3, fireTimer: int(random(30, 90)) });
     } else if (!jefeMostrado) {
       jefe = { x: width / 2, y: 100 };
       jefeMostrado = true;
